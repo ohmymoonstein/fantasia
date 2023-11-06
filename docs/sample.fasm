@@ -1,0 +1,15 @@
+.global $counter i32
+
+func $global($a i32, $b i32) (i32)
+    local.get $a
+    local.get $b
+    add
+    return 1
+end
+
+func $main() (i32)
+    ldv 10
+    ldv 20
+    call $add
+    return 1
+end
