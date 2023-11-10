@@ -12,7 +12,11 @@ else()
 endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0")
 
-add_executable(assembler "assembler/main.cc" "assembler/lexer.cc" "assembler/parser.cc")
+add_executable(assembler
+    "assembler/main.cc"
+    "assembler/lexer.cc"
+    "assembler/debugging.cc"
+    "assembler/parser.cc")
 set_target_properties(assembler PROPERTIES
     OUTPUT_NAME "fasm"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" )

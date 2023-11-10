@@ -32,8 +32,6 @@ std::shared_ptr<Program> Parser::parse() {
 std::shared_ptr<Function> Parser::parse_function() {
     auto result = std::make_shared<Function>();
 
-std::cerr << __FUNCTION__ << " ";
-
     // func keyword
     auto token = tokenizer_.get();
     if (token.type != TOK_FUNC)
@@ -61,7 +59,7 @@ std::cerr << __FUNCTION__ << " ";
     if (token.type != TOK_LBREAK)
         throw std::runtime_error("Unexpected token");
 
-std::cerr << "[  Name: " << result->name << "]\n";
+    std::cout << result << '\n';
 
     return result;
 }
@@ -111,8 +109,6 @@ void Parser::parse_type_list(std::list<std::string> &result) {
 std::shared_ptr<GlobalVariable> Parser::parse_global_variable() {
     auto result = std::make_shared<GlobalVariable>();
 
-std::cerr << __FUNCTION__ << " ";
-
     // global keyword
     auto token = tokenizer_.get();
     if (token.type != TOK_GLOBAL)
@@ -138,9 +134,7 @@ std::cerr << __FUNCTION__ << " ";
     if (token.type != TOK_LBREAK)
         throw std::runtime_error("Unexpected token");
 
-std::cerr << "[  Name: " << result->name
-    << ", Type: " << result->type
-    << ", Value: " << result->value << "]\n";
+    std::cout << result << '\n';
 
     return result;
 }

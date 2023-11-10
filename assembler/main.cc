@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
         return 0;
 #endif
         Tokenizer tokenizer(scanner);
-#if 1
+#if 0
         Token token;
         while ((token = tokenizer.get()).type != TOK_EOF)
         {

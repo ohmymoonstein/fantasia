@@ -19,6 +19,9 @@ struct Function {
     std::list<std::string> returns;
 };
 
+std::ostream& operator<<(std::ostream &, const std::shared_ptr<GlobalVariable> &);
+std::ostream& operator<<(std::ostream &, const std::shared_ptr<Parameter> &);
+std::ostream& operator<<(std::ostream &, const std::shared_ptr<Function> &);
 
 // Root node for our AST
 struct Program {
