@@ -8,6 +8,11 @@ func $global() (i32,i32)
     add
     return 1
 end
+
+		
+      
+	
+
 func $main() (i32)
     ldv 10
     ldv 20

@@ -42,7 +42,7 @@ class Scanner {
     private:
         std::string::iterator cursor_;
         std::string content_;
-        char last_ = 0;
+        bool has_content_ = false;
 };
 
 class Tokenizer {

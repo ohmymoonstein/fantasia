@@ -2,6 +2,8 @@
 #include <exception>
 #include <stdexcept>
 #include <array>
+#include <iostream>
+#include <cstdarg>
 
 #define TKLIT(x) #x
 
@@ -35,6 +37,16 @@ const std::array<Keyword, 4> KEYWORDS = {{
     {"func", TOK_FUNC},
 }};
 
+static std::string format(const char *format, ...) {
+    char buffer[512];
+    va_list args;
+    va_start(args, format);
+	vsnprintf(buffer, sizeof(buffer) - 1, format, args);
+	va_end(args);
+    buffer[sizeof(buffer) -1] = 0;
+    return buffer;
+}
+
 Scanner::Scanner(const std::string_view &code) : content_(code) {
     cursor_ = content_.begin();
 }
@@ -42,32 +54,26 @@ Scanner::Scanner(const std::string_view &code) : content_(code) {
 char Scanner::get() {
     if (cursor_ == content_.end())
         return 0;
-    char current = 0;
-    do {
-        skip_spaces();
-        current = *cursor_++;
-        if (current != '\n' || last_ != '\n')
-            return last_ = current;
-    } while (current != 0);
-    return current;
+    if (*cursor_ == '\n')
+    {
+        while (isspace(*cursor_))
+            cursor_++;
+        return '\n';
+    }
+    return *cursor_++;
 }
 
 char Scanner::peek() {
     if (cursor_ == content_.end())
         return 0;
-    char current = 0;
-    do {
-        skip_spaces();
-        current = *cursor_++;
-        if (current != '\n' || last_ != '\n')
-            return last_ = current;
-    } while (current != 0);
-    return current;
+    return *cursor_;
 }
 
 void Scanner::skip_spaces() {
-    // TODO: return line breaks for non-empty lines
-    while (*cursor_ != '\n' && isspace(*cursor_)) cursor_++;
+    if (cursor_ == content_.end())
+        return;
+    while (*cursor_ != '\n' && isspace(*cursor_))
+        cursor_++;
 }
 
 Tokenizer::Tokenizer( Scanner &scanner ) : scanner_(scanner) {
@@ -119,7 +125,7 @@ Token Tokenizer::next() {
         case '$':
             return capture_name();
         default:
-            throw std::runtime_error("Token not recognized");
+            throw std::runtime_error(format("Symbol not recognized: %d", (int)c));
     }
 }
 

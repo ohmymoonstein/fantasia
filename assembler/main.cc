@@ -19,8 +19,15 @@ int main(int argc, char **argv) {
         input.read(content.data(), size);
 
         Scanner scanner(content);
+#if 0
+        char c;
+        while ((c = scanner.get()) != 0)
+        {
+            std::cout << c;
+        }
+        return 0;
+#endif
         Tokenizer tokenizer(scanner);
-
 #if 1
         Token token;
         while ((token = tokenizer.get()).type != TOK_EOF)
