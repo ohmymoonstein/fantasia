@@ -2,16 +2,14 @@ global $counter i32 555
 global $cenoura string 1024
 global $acerola i16 22
 
-func $global() (i32,i32)
+func $global($param1 int, $param2 i32) (i32,i32)
     local.get $a
     local.get $b
+
+
     add
     return 1
 end
-
-		
-      
-	
 
 func $main() (i32)
     ldv 10

@@ -51,7 +51,8 @@ class Tokenizer {
         Tokenizer() = default;
 
         Token peek();
-        Token get();
+        Token advance();
+        Token expected( TokenType type );
         Token capture_name();
         Token capture_identifier( char c );
         Token capture_integer( char c );

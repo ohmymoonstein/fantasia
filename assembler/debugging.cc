@@ -9,7 +9,7 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<GlobalVariable>
 }
 
 std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Parameter> &target) {
-    os << "Function [name: " << target->name << "]";
+    os << "    Parameter [name: " << target->name << ", type: " << target->type << "]";
     return os;
 }
 

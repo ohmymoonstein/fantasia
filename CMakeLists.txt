@@ -13,6 +13,7 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0")
 
 add_executable(assembler
+    "assembler/util.cc"
     "assembler/main.cc"
     "assembler/lexer.cc"
     "assembler/debugging.cc"

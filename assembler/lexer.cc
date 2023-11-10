@@ -1,4 +1,5 @@
 #include "lexer.hh"
+#include "util.hh"
 #include <exception>
 #include <stdexcept>
 #include <array>
@@ -37,16 +38,6 @@ const std::array<Keyword, 4> KEYWORDS = {{
     {"func", TOK_FUNC},
 }};
 
-static std::string format(const char *format, ...) {
-    char buffer[512];
-    va_list args;
-    va_start(args, format);
-	vsnprintf(buffer, sizeof(buffer) - 1, format, args);
-	va_end(args);
-    buffer[sizeof(buffer) -1] = 0;
-    return buffer;
-}
-
 Scanner::Scanner(const std::string_view &code) : content_(code) {
     cursor_ = content_.begin();
 }
@@ -81,7 +72,7 @@ Tokenizer::Tokenizer( Scanner &scanner ) : scanner_(scanner) {
     current_.type = TOK_INVALID;
 }
 
-Token Tokenizer::get() {
+Token Tokenizer::advance() {
     Token token;
     if (current_.type != TOK_INVALID) {
         token = current_;
@@ -91,6 +82,14 @@ Token Tokenizer::get() {
 
     token = next();
     last_type_ = token.type;
+    return token;
+}
+
+Token Tokenizer::expected( TokenType type ) {
+    auto token = advance();
+    if (token.type != type)
+        throw std::runtime_error(
+            util_format("Expected %s but found %s", Token::name(type), Token::name(token.type)));
     return token;
 }
 
@@ -125,17 +124,19 @@ Token Tokenizer::next() {
         case '$':
             return capture_name();
         default:
-            throw std::runtime_error(format("Symbol not recognized: %d", (int)c));
+            throw std::runtime_error(util_format("Symbol not recognized: %d", (int)c));
     }
 }
 
 Token Tokenizer::capture_name() {
     Token token(TOK_NAME);
 
+    // TODO: first char must be alphabetic
+
     char c;
     do {
         c = scanner_.peek();
-        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
             token.literal += c;
         else
             return token;

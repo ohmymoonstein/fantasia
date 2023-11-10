@@ -1,4 +1,5 @@
 #include "parser.hh"
+#include "util.hh"
 #include <stdexcept>
 #include <iostream>
 
@@ -33,31 +34,23 @@ std::shared_ptr<Function> Parser::parse_function() {
     auto result = std::make_shared<Function>();
 
     // func keyword
-    auto token = tokenizer_.get();
-    if (token.type != TOK_FUNC)
-        throw std::runtime_error("Unexpected token");
+    auto token = tokenizer_.expected(TOK_FUNC);
 
     // variable name
-    token = tokenizer_.get();
+    token = tokenizer_.advance();
     if (token.type != TOK_NAME)
         throw std::runtime_error("Unexpected token");
     result->name = token.literal;
     // left parentesis
-    token = tokenizer_.peek();
-    if (token.type != TOK_LPAREN)
-        throw std::runtime_error("Unexpected token");
+    tokenizer_.expected(TOK_LPAREN);
     // parse parameters (handle the right parentesis too)
     parse_parameter_list(result->params);
     // left parentesis
-    token = tokenizer_.peek();
-    if (token.type != TOK_LPAREN)
-        throw std::runtime_error("Unexpected token");
+    tokenizer_.expected(TOK_LPAREN);
     // parse types (handle the right parentesis too)
     parse_type_list(result->returns);
     // line break
-    token = tokenizer_.get();
-    if (token.type != TOK_LBREAK)
-        throw std::runtime_error("Unexpected token");
+    tokenizer_.expected(TOK_LBREAK);
 
     std::cout << result << '\n';
 
@@ -66,73 +59,57 @@ std::shared_ptr<Function> Parser::parse_function() {
 
 void Parser::parse_parameter_list(std::list<std::shared_ptr<Parameter>> &result) {
     // left parentesis
-    auto token = tokenizer_.get();
-    if (token.type != TOK_LPAREN)
-        throw std::runtime_error("Unexpected token");
+    //tokenizer_.expected(TOK_LPAREN);
 
+    Token token;
     while ((token = tokenizer_.peek()).type == TOK_NAME) {
-        result.push_back( parse_parameter() );
+        // parse parameter
+        auto param = std::make_shared<Parameter>();
+        param->name = token.literal;
+        tokenizer_.advance();
+        token = tokenizer_.expected(TOK_IDENTIFIER);
+        param->type = token.literal;
+        result.push_back( param );
+
         token = tokenizer_.peek();
         if (token.type == TOK_RPAREN) break;
-        token = tokenizer_.get();
-        if (token.type != TOK_COMMA)
-            throw std::runtime_error("Unexpected token");
+        tokenizer_.expected(TOK_COMMA);
     }
 
-    token = tokenizer_.get();
-    if (token.type != TOK_RPAREN)
-        throw std::runtime_error("Unexpected token");
-}
-
-std::shared_ptr<Parameter> Parser::parse_parameter() {
-    return nullptr;
+    tokenizer_.advance();
 }
 
 void Parser::parse_type_list(std::list<std::string> &result) {
-    // left parentesis
-    auto token = tokenizer_.get();
-    if (token.type != TOK_LPAREN)
-        throw std::runtime_error("Unexpected token");
-
-    while ((token = tokenizer_.get()).type == TOK_IDENTIFIER) {
+    Token token;
+    while ((token = tokenizer_.advance()).type == TOK_IDENTIFIER) {
         result.push_back(token.literal);
-        token = tokenizer_.get(); // ( or ,
+        token = tokenizer_.peek(); // ) or ,
         if (token.type == TOK_RPAREN) break;
-        if (token.type != TOK_COMMA)
-            throw std::runtime_error("Unexpected token");
+        tokenizer_.expected(TOK_COMMA);
     }
 
-    if (token.type != TOK_RPAREN)
-        throw std::runtime_error("Unexpected token");
+    tokenizer_.advance();
 }
 
 std::shared_ptr<GlobalVariable> Parser::parse_global_variable() {
     auto result = std::make_shared<GlobalVariable>();
 
     // global keyword
-    auto token = tokenizer_.get();
+    auto token = tokenizer_.advance();
     if (token.type != TOK_GLOBAL)
         throw std::runtime_error("Unexpected token");
 
     // variable name
-    token = tokenizer_.get();
-    if (token.type != TOK_NAME)
-        throw std::runtime_error("Unexpected token");
+    token = tokenizer_.expected(TOK_NAME);
     result->name = token.literal;
     // variable type
-    token = tokenizer_.get();
-    if (token.type != TOK_IDENTIFIER)
-        throw std::runtime_error("Unexpected token");
+    token = tokenizer_.expected(TOK_IDENTIFIER);
     result->type = token.literal;
     // initialization value
-    token = tokenizer_.get();
-    if (token.type != TOK_INTEGER)
-        throw std::runtime_error("Unexpected token");
+    token = tokenizer_.expected(TOK_INTEGER);
     result->value = token.literal;
     // line break
-    token = tokenizer_.get();
-    if (token.type != TOK_LBREAK)
-        throw std::runtime_error("Unexpected token");
+    tokenizer_.expected(TOK_LBREAK);
 
     std::cout << result << '\n';
 
