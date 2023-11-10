@@ -142,7 +142,7 @@ local.set   | medium | Set the value of a local variable or parameter. | index |
 global.get  | medium | Get the value of a global variable. | index | `[] -> [i32]`
 global.set  | medium | Set the value of a global variable. | index | `[i32] -> []`
 call        | medium | Call a function. | index | `[*] -> [*]`
-return      | small  | Clean up the stack and returns `count` values (zero or more) to the caller. The values returned are those that are at the top of the stack when the instruction is executed. | count | `[*] -> [*]`
+return      | medium  | Clean up the stack and returns `count` values (zero or more) to the caller. The values returned are those that are at the top of the stack when the instruction is executed. | count | `[*] -> [*]`
 jmp         | medium  | Jump to label unconditionally. | label_id | `[] -> []`
 jt          | medium  | Jump to label if `arg1` is non-zero (i.e. true) | label_id | `[i32] -> []`
 jf          | medium  | Jump to label if `arg1` is zero (i.e. false) | label_id | `[i32] -> []`
