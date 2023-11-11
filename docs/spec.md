@@ -137,10 +137,10 @@ ldc         | medium | Load a 32-bits value from the constant pool. | index | `[
 ldv         | medium | Load a 10-bits value from immediate. | value | `[] -> [i32]`
 ldo         | small  | Load a one value. | N/A | `[] -> [i32]`
 ldz         | small  | Load a zero value. | N/A | `[] -> [i32]`
-local.get   | medium | Get the value of a local variable or parameter. | index | `[] -> [i32]`
-local.set   | medium | Set the value of a local variable or parameter. | index | `[i32] -> []`
-global.get  | medium | Get the value of a global variable. | index | `[] -> [i32]`
-global.set  | medium | Set the value of a global variable. | index | `[i32] -> []`
+lget        | medium | Get the value of a local variable or parameter. | index | `[] -> [i32]`
+lset        | medium | Set the value of a local variable or parameter. | index | `[i32] -> []`
+gget        | medium | Get the value of a global variable. | index | `[] -> [i32]`
+gset        | medium | Set the value of a global variable. | index | `[i32] -> []`
 call        | medium | Call a function. | index | `[*] -> [*]`
 return      | medium  | Clean up the stack and returns `count` values (zero or more) to the caller. The values returned are those that are at the top of the stack when the instruction is executed. | count | `[*] -> [*]`
 jmp         | medium  | Jump to label unconditionally. | label_id | `[] -> []`

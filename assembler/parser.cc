@@ -9,23 +9,27 @@ Parser::Parser(Tokenizer &tokenizer) : tokenizer_(tokenizer) {
 
 std::shared_ptr<Program> Parser::parse() {
     auto result = std::make_shared<Program>();
+    bool done = false;
 
     do {
-        auto token = tokenizer_.peek();
+        auto token = tokenizer_.advance();
         switch (token.type)
         {
             case TOK_GLOBAL:
-                result->variables.push_back( parse_global_variable() );
+                result->variables.push_back( parse_variable() );
                 break;
             case TOK_FUNC:
                 result->functions.push_back( parse_function() );
                 break;
             case TOK_EOF:
+                done = true;
                 break;
             default:
-                throw std::runtime_error("Unexpected token");
+                throw std::runtime_error(util_format("Unexpected token %s", Token::name(token.type)));
         }
-    } while (true);
+    } while (!done);
+
+    std::cout << result << '\n';
 
     return result;
 }
@@ -33,34 +37,51 @@ std::shared_ptr<Program> Parser::parse() {
 std::shared_ptr<Function> Parser::parse_function() {
     auto result = std::make_shared<Function>();
 
-    // func keyword
-    auto token = tokenizer_.expected(TOK_FUNC);
-
     // variable name
-    token = tokenizer_.advance();
-    if (token.type != TOK_NAME)
-        throw std::runtime_error("Unexpected token");
+    auto token = tokenizer_.expected(TOK_NAME);
     result->name = token.literal;
+
     // left parentesis
     tokenizer_.expected(TOK_LPAREN);
     // parse parameters (handle the right parentesis too)
     parse_parameter_list(result->params);
+
     // left parentesis
     tokenizer_.expected(TOK_LPAREN);
     // parse types (handle the right parentesis too)
     parse_type_list(result->returns);
+
     // line break
     tokenizer_.expected(TOK_LBREAK);
 
-    std::cout << result << '\n';
+    // local variables
+    while ((token = tokenizer_.peek()).type == TOK_LOCAL) {
+        tokenizer_.advance();
+        auto var = parse_variable();
+        var->is_local = true;
+        result->variables.push_back(var);
+    }
+
+    parse_function_body(result->body);
+
+    tokenizer_.expected(TOK_END);
+    tokenizer_.expected(TOK_LBREAK);
 
     return result;
 }
 
-void Parser::parse_parameter_list(std::list<std::shared_ptr<Parameter>> &result) {
-    // left parentesis
-    //tokenizer_.expected(TOK_LPAREN);
+void Parser::parse_function_body( std::list<std::shared_ptr<Instruction>> &result ) {
+    Token token;
+    while ((token = tokenizer_.peek()).type == TOK_OPCODE) {
+        auto instr = std::make_shared<Instruction>();
+        instr->opcode = token.literal;
+        result.push_back(instr);
+        tokenizer_.advance();
+        tokenizer_.expected(TOK_LBREAK);
+    }
+}
 
+void Parser::parse_parameter_list(std::list<std::shared_ptr<Parameter>> &result) {
     Token token;
     while ((token = tokenizer_.peek()).type == TOK_NAME) {
         // parse parameter
@@ -91,16 +112,11 @@ void Parser::parse_type_list(std::list<std::string> &result) {
     tokenizer_.advance();
 }
 
-std::shared_ptr<GlobalVariable> Parser::parse_global_variable() {
-    auto result = std::make_shared<GlobalVariable>();
-
-    // global keyword
-    auto token = tokenizer_.advance();
-    if (token.type != TOK_GLOBAL)
-        throw std::runtime_error("Unexpected token");
+std::shared_ptr<Variable> Parser::parse_variable() {
+    auto result = std::make_shared<Variable>();
 
     // variable name
-    token = tokenizer_.expected(TOK_NAME);
+    auto token = tokenizer_.expected(TOK_NAME);
     result->name = token.literal;
     // variable type
     token = tokenizer_.expected(TOK_IDENTIFIER);
@@ -110,8 +126,6 @@ std::shared_ptr<GlobalVariable> Parser::parse_global_variable() {
     result->value = token.literal;
     // line break
     tokenizer_.expected(TOK_LBREAK);
-
-    std::cout << result << '\n';
 
     return result;
 }

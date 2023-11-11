@@ -5,6 +5,7 @@
 #include <array>
 #include <iostream>
 #include <cstdarg>
+#include <set>
 
 #define TKLIT(x) #x
 
@@ -36,6 +37,55 @@ const std::array<Keyword, 4> KEYWORDS = {{
     {"local", TOK_LOCAL},
     {"end", TOK_END},
     {"func", TOK_FUNC},
+}};
+
+const std::set<std::string_view> OPCODES = {{
+    "add",
+    "sub",
+    "mul",
+    "sdiv",
+    "udiv",
+    "srem",
+    "urem",
+    "and",
+    "or",
+    "xor",
+    "shl",
+    "shr",
+    "rotl",
+    "rotr",
+    "eq",
+    "ne",
+    "slt",
+    "sgt",
+    "sle",
+    "sge",
+    "ult",
+    "ugt",
+    "ule",
+    "uge",
+    "clz",
+    "ctz",
+    "cbit",
+    "load",
+    "store",
+    "ldc",
+    "ldv",
+    "ldo",
+    "ldz",
+    "lget",
+    "lset",
+    "gget",
+    "gset",
+    "call",
+    "return",
+    "jmp",
+    "jt",
+    "jf",
+    "drop",
+    "dup",
+    "nop",
+    "trap",
 }};
 
 Scanner::Scanner(const std::string_view &code) : content_(code) {
@@ -96,12 +146,19 @@ Token Tokenizer::expected( TokenType type ) {
 Token Tokenizer::next() {
     scanner_.skip_spaces();
     auto c = scanner_.get();
+    // identifiers
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
         auto token = capture_identifier(c);
+        // translate keywords
         for (const Keyword &entry : KEYWORDS) {
             if (entry.literal == token.literal) {
                 token.type = entry.type;
             }
+        }
+        // translate opcoes
+        // TODO: faster search
+        if (OPCODES.find(token.literal) != OPCODES.end()) {
+            token.type = TOK_OPCODE;
         }
         return token;
     }

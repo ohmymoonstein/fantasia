@@ -3,17 +3,19 @@ global $cenoura string 1024
 global $acerola i16 22
 
 func $global($param1 int, $param2 i32) (i32,i32)
-    local.get $a
-    local.get $b
+    local $beterraba int 99
+    local $beterraba int 99
 
-
+    lget
+    lget
     add
-    return 1
+
+    return
 end
 
 func $main() (i32)
-    ldv 10
-    ldv 20
-    call $add
-    return 1
+    ldv
+    ldv
+    call
+    return
 end
