@@ -25,6 +25,8 @@ static const std::array TOKENS{
     TKLIT(TOK_COMMENT),
     TKLIT(TOK_END),
     TKLIT(TOK_LBREAK),
+    TKLIT(TOK_CONST),
+    TKLIT(TOK_INVALID),
 };
 
 struct Keyword {
@@ -32,9 +34,10 @@ struct Keyword {
     TokenType type;
 };
 
-const std::array<Keyword, 4> KEYWORDS = {{
+const std::array<Keyword, 5> KEYWORDS = {{
     {"global", TOK_GLOBAL},
     {"local", TOK_LOCAL},
+    {"const", TOK_CONST},
     {"end", TOK_END},
     {"func", TOK_FUNC},
 }};
@@ -162,7 +165,7 @@ Token Tokenizer::next() {
         }
         return token;
     }
-    if ((c >= '0' && c <= '9'))
+    if ((c >= '0' && c <= '9') || c == '+' || c == '-')
         return capture_integer(c);
     // TODO: translate line breaks as 'end' token
     switch (c) {

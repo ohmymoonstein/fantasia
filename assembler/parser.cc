@@ -29,8 +29,6 @@ std::shared_ptr<Program> Parser::parse() {
         }
     } while (!done);
 
-    std::cout << result << '\n';
-
     return result;
 }
 
@@ -58,8 +56,15 @@ std::shared_ptr<Function> Parser::parse_function() {
     while ((token = tokenizer_.peek()).type == TOK_LOCAL) {
         tokenizer_.advance();
         auto var = parse_variable();
-        var->is_local = true;
+        var->kind = VAR_LOCAL;
         result->variables.push_back(var);
+    }
+    // local constants
+    while ((token = tokenizer_.peek()).type == TOK_CONST) {
+        tokenizer_.advance();
+        auto var = parse_variable();
+        var->kind = VAR_CONST;
+        result->constants.push_back(var);
     }
 
     parse_function_body(result->body);
@@ -73,10 +78,17 @@ std::shared_ptr<Function> Parser::parse_function() {
 void Parser::parse_function_body( std::list<std::shared_ptr<Instruction>> &result ) {
     Token token;
     while ((token = tokenizer_.peek()).type == TOK_OPCODE) {
+        // instruction (opcode)
         auto instr = std::make_shared<Instruction>();
         instr->opcode = token.literal;
-        result.push_back(instr);
         tokenizer_.advance();
+        // check for immediate
+        token = tokenizer_.peek();
+        if (tokenizer_.peek().type == TOK_INTEGER) {
+            instr->immediate = token.literal;
+            tokenizer_.advance();
+        }
+        result.push_back(instr);
         tokenizer_.expected(TOK_LBREAK);
     }
 }

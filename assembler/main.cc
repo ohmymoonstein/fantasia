@@ -5,6 +5,7 @@
 #include <exception>
 #include "lexer.hh"
 #include "parser.hh"
+#include "semantic.hh"
 
 int main(int argc, char **argv) {
     std::ifstream input(argv[1]);
@@ -40,6 +41,10 @@ int main(int argc, char **argv) {
 #else
         Parser parser(tokenizer);
         auto program = parser.parse();
+        std::cout << program << '\n';
+
+        Semantic semantic(program);
+        semantic.validate();
 #endif
     }
     return 0;

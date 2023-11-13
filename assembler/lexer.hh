@@ -18,6 +18,7 @@ enum TokenType {
     TOK_COMMENT,
     TOK_END,
     TOK_LBREAK,
+    TOK_CONST,
     TOK_INVALID,
 };
 
