@@ -1,15 +1,23 @@
-.global $counter i32
+global $counter i32 -1
+global $cenoura u32 1024
+global $acerola i32 22
 
-func $global($a i32, $b i32) (i32)
-    local.get $a
-    local.get $b
+func $global($param1 i32, $param2 i32) (i32,i32)
+    local $beterraba1 u32 99
+    local $beterraba2 u32 99
+    const $nome1 i32 3201201
+    const $nome2 i32 3201201
+
+    lget
+    lget
     add
+
     return 1
 end
 
 func $main() (i32)
-    ldv 10
-    ldv 20
-    call $add
+    ldv
+    ldv 1
+    call
     return 1
 end
