@@ -11,15 +11,19 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Program> &targe
 
 std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Variable> &target) {
     if (target->kind == VAR_LOCAL)
-        os << "    Varibale";
+        os << "    Variable";
     else
     if (target->kind == VAR_CONST)
         os << "    Constant";
     else
         os << "Variable";
     os << " [name: '" << target->name
-        << "', type: '" << target->type.type
-        << "', value: '" << target->value << "']";
+        << "', type: '" << target->type.type;
+
+    if (target->value.type == TOK_STRING)
+        os << "', value: '" << target->value.literal << "']";
+    else
+        os << "', value: " << target->value.literal << "]";
     return os;
 }
 

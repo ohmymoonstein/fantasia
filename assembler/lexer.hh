@@ -20,6 +20,7 @@ enum TokenType {
     TOK_END,
     TOK_LBREAK,
     TOK_CONST,
+    TOK_STRING,
     TOK_INVALID,
 };
 
@@ -61,8 +62,10 @@ class Tokenizer {
         Token peek();
         Token advance();
         Token expected( TokenType type );
+        Token expected( std::initializer_list<TokenType> types );
         Token capture_name();
         Token capture_identifier( char c );
+        Token capture_string();
         Token capture_integer( char c );
 
     private:

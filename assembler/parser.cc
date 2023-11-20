@@ -136,8 +136,8 @@ std::shared_ptr<Variable> Parser::parse_variable() {
     token = tokenizer_.expected(TOK_IDENTIFIER);
     result->type.type = token.literal;
     // initialization value
-    token = tokenizer_.expected(TOK_INTEGER);
-    result->value = token.literal;
+    token = tokenizer_.expected({TOK_INTEGER, TOK_STRING});
+    result->value = token;
     // line break
     tokenizer_.expected(TOK_LBREAK);
 

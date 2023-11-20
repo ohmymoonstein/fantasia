@@ -31,13 +31,16 @@ int main(int argc, char **argv) {
         Tokenizer tokenizer(scanner);
 #if 0
         Token token;
-        while ((token = tokenizer.get()).type != TOK_EOF)
+        while ((token = tokenizer.advance()).type != TOK_EOF)
         {
             std::cout << Token::name(token.type);
             if (token.type == TOK_NAME || token.type == TOK_IDENTIFIER || token.type == TOK_INTEGER)
                 std::cout << " " << token.literal;
+            if (token.type == TOK_STRING)
+                std::cout << " \"" << token.literal << "\"";
             std::cout << '\n';
         }
+        std::cout << "Done\n";
 #else
         Parser parser(tokenizer);
         auto program = parser.parse();

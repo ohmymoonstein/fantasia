@@ -23,6 +23,8 @@ ASCII code        | 8bit
 Background color  | 4bit
 Text color        | 4bit
 
+TODO: keep interlaced or change to planar?
+
 240x136 4bpp
 
 ### Mouse IO
@@ -104,54 +106,60 @@ medium  | 16-bits | 6-bits | 10-bits unsigned int
 
 Instruction | Scheme | Description | Immediate | Stack bahaviour
 ------------|--------|-------------|-----------|-----------------
-add         | small  | Sign-agnostic addition (`arg1` + `arg2`). | N/A | `[i32 i32] -> [i32]`
-sub         | small  | Sign-agnostic subtraction (`arg1` - `arg2`). | N/A | `[i32 i32] -> [i32]`
-mul         | small  | Sign-agnostic multiplication (`arg1` * `arg2`), modulo 2^32. | N/A | `[i32 i32] -> [i32]`
-sdiv        | small  | Signed division (`arg1` / `arg2`), result is truncated towards zero. | N/A | `[i32 i32] -> [i32]`
-udiv        | small  | Unsigned division (`arg1` / `arg2`), result is floored. | N/A | `[i32 i32] -> [i32]`
-srem        | small  | Signed remainder (`arg1` mod `arg2`), result has the sign of the dividend. | N/A | `[i32 i32] -> [i32]`
-urem        | small  | Unsigned remainder (`arg1` mod `arg2`). | N/A | `[i32 i32] -> [i32]`
-and         | small  | Sign-agnostic bitwise "and" (`arg1` and `arg2`) | N/A | `[i32 i32] -> [i32]`
-or          | small  | Sign-agnostic bitwise "or" (`arg1` or `arg2`) | N/A | `[i32 i32] -> [i32]`
-xor         | small  | Sign-agnostic bitwise "xor" (`arg1` xor `arg2`) | N/A | `[i32 i32] -> [i32]`
-shl         | small  | Sign-agnostic shift left `arg1` by `arg2` bits, modulo 2^32 | N/A | `[i32 i32] -> [i32]`
-shr         | small  | Sign-agnostic shift right `arg1` by `arg2` bits, modulo 2^32 | N/A | `[i32 i32] -> [i32]`
-rotl        | small  | Sign-agnostic rotate `arg1` by `arg2` bits. | N/A | `[i32 i32] -> [i32]`
-rotr        | small  | Sign-agnostic rotate `arg1` by `arg2` bits. | N/A | `[i32 i32] -> [i32]`
-eq          | small  | Sign-agnostic comparison which returns non-zero if `arg1` is equal to `arg2`. | N/A | `[i32 i32] -> [i32]`
-ne          | small  | Sign-agnostic comparison which returns non-zero if `arg1` is not equal to `arg2`. | N/A |`[i32 i32] -> [i32]`
-slt         | small  | Signed comparison which returns non-zero if `arg1` is less than `arg2`. | N/A | `[i32 i32] -> [i32]`
-sgt         | small  | Signed comparison which returns non-zero if `arg1` is grater than `arg2`. | N/A |    `[i32 i32] -> [i32]`
-sle         | small  | Signed comparison which returns non-zero if `arg1` is less than or equal to `arg2`. | N/A |    `[i32 i32] -> [i32]`
-sge         | small  | Signed comparison which returns non-zero if `arg1` is grater than or equal to `arg2`. | N/A |    `[i32 i32] -> [i32]`
-ult         | small  | Unsigned comparison which returns non-zero if `arg1` is less than `arg2`. | N/A |`[i32 i32] -> [i32]`
-ugt         | small  | Unsigned comparison which returns non-zero if `arg1` is grater than `arg2`. | N/A | `[i32 i32] -> [i32]`
-ule         | small  | Unsigned comparison which returns non-zero if `arg1` is less than or equal to `arg2`. | N/A |    `[i32 i32] -> [i32]`
-uge         | small  | Unsigned comparison which returns non-zero if `arg1` is grater than or equal to `arg2`. | N/A |    `[i32 i32] -> [i32]`
-clz         | small  | Count of leading zero bits in `arg1`. All zero bits are considered leading if the value is zero. | N/A | `[i32] -> [i32]`
-ctz         | small  | Count of trailing zero bits in `arg1`. All zero bits are considered trailing if the value is zero. | N/A | `[i32] -> [i32]`
-cbit        | small  | Count number of one bits in `arg1`. | N/A | `[i32] -> [i32]`
-load        | small  | Load a 32-bits value from memory at address `arg1`. | N/A | `[i32] -> [i32]`
-store       | small  | Store a 32-bits value `arg2` at memory at address `arg1`. | N/A | `[i32 i32] -> []`
-ldc         | medium | Load a 32-bits value from the constant pool. | index | `[] -> [i32]`
-ldv         | medium | Load a 10-bits value from immediate. | value | `[] -> [i32]`
-ldo         | small  | Load a one value. | N/A | `[] -> [i32]`
-ldz         | small  | Load a zero value. | N/A | `[] -> [i32]`
-lget        | medium | Get the value of a local variable or parameter. | index | `[] -> [i32]`
-lset        | medium | Set the value of a local variable or parameter. | index | `[i32] -> []`
-gget        | medium | Get the value of a global variable. | index | `[] -> [i32]`
-gset        | medium | Set the value of a global variable. | index | `[i32] -> []`
+add         | small  | Sign-agnostic addition (`arg1` + `arg2`). | N/A | `[int int] -> [int]`
+sub         | small  | Sign-agnostic subtraction (`arg1` - `arg2`). | N/A | `[int int] -> [int]`
+mul         | small  | Sign-agnostic multiplication (`arg1` * `arg2`), modulo 2^32. | N/A | `[int int] -> [int]`
+sdiv        | small  | Signed division (`arg1` / `arg2`), result is truncated towards zero. | N/A | `[int int] -> [int]`
+udiv        | small  | Unsigned division (`arg1` / `arg2`), result is floored. | N/A | `[int int] -> [int]`
+srem        | small  | Signed remainder (`arg1` mod `arg2`), result has the sign of the dividend. | N/A | `[int int] -> [int]`
+urem        | small  | Unsigned remainder (`arg1` mod `arg2`). | N/A | `[int int] -> [int]`
+and         | small  | Sign-agnostic bitwise "and" (`arg1` and `arg2`) | N/A | `[int int] -> [int]`
+or          | small  | Sign-agnostic bitwise "or" (`arg1` or `arg2`) | N/A | `[int int] -> [int]`
+xor         | small  | Sign-agnostic bitwise "xor" (`arg1` xor `arg2`) | N/A | `[int int] -> [int]`
+shl         | small  | Sign-agnostic shift left `arg1` by `arg2` bits, modulo 2^32 | N/A | `[int int] -> [int]`
+shr         | small  | Sign-agnostic shift right `arg1` by `arg2` bits, modulo 2^32 | N/A | `[int int] -> [int]`
+rotl        | small  | Sign-agnostic rotate `arg1` by `arg2` bits. | N/A | `[int int] -> [int]`
+rotr        | small  | Sign-agnostic rotate `arg1` by `arg2` bits. | N/A | `[int int] -> [int]`
+eq          | small  | Sign-agnostic comparison which returns non-zero if `arg1` is equal to `arg2`. | N/A | `[int int] -> [int]`
+ne          | small  | Sign-agnostic comparison which returns non-zero if `arg1` is not equal to `arg2`. | N/A |`[int int] -> [int]`
+slt         | small  | Signed comparison which returns non-zero if `arg1` is less than `arg2`. | N/A | `[int int] -> [int]`
+sgt         | small  | Signed comparison which returns non-zero if `arg1` is grater than `arg2`. | N/A |    `[int int] -> [int]`
+sle         | small  | Signed comparison which returns non-zero if `arg1` is less than or equal to `arg2`. | N/A |    `[int int] -> [int]`
+sge         | small  | Signed comparison which returns non-zero if `arg1` is grater than or equal to `arg2`. | N/A |    `[int int] -> [int]`
+ult         | small  | Unsigned comparison which returns non-zero if `arg1` is less than `arg2`. | N/A |`[int int] -> [int]`
+ugt         | small  | Unsigned comparison which returns non-zero if `arg1` is grater than `arg2`. | N/A | `[int int] -> [int]`
+ule         | small  | Unsigned comparison which returns non-zero if `arg1` is less than or equal to `arg2`. | N/A |    `[int int] -> [int]`
+uge         | small  | Unsigned comparison which returns non-zero if `arg1` is grater than or equal to `arg2`. | N/A |    `[int int] -> [int]`
+clz         | small  | Count of leading zero bits in `arg1`. All zero bits are considered leading if the value is zero. | N/A | `[int] -> [int]`
+ctz         | small  | Count of trailing zero bits in `arg1`. All zero bits are considered trailing if the value is zero. | N/A | `[int] -> [int]`
+cbit        | small  | Count number of one bits in `arg1`. | N/A | `[int] -> [int]`
+load        | small  | Load a 32-bits value from memory at address `arg1`. | N/A | `[int] -> [int]`
+store       | small  | Store a 32-bits value `arg2` at memory at address `arg1`. | N/A | `[int int] -> []`
+ldc         | medium | Load a 32-bits value from the constant pool. | index | `[] -> [int]`
+ldv         | medium | Load a 10-bits value from immediate. | value | `[] -> [int]`
+ldo         | small  | Load a one value. | N/A | `[] -> [int]`
+ldz         | small  | Load a zero value. | N/A | `[] -> [int]`
+lget        | medium | Get the value of a local variable or parameter. | index | `[] -> [int]`
+lset        | medium | Set the value of a local variable or parameter. | index | `[int] -> []`
+gget        | medium | Get the value of a global variable. | index | `[] -> [int]`
+gset        | medium | Set the value of a global variable. | index | `[int] -> []`
 call        | medium | Call a function. | index | `[*] -> [*]`
 return      | medium  | Clean up the stack and returns `count` values (zero or more) to the caller. The values returned are those that are at the top of the stack when the instruction is executed. | count | `[*] -> [*]`
 jmp         | medium  | Jump to label unconditionally. | label_id | `[] -> []`
-jt          | medium  | Jump to label if `arg1` is non-zero (i.e. true) | label_id | `[i32] -> []`
-jf          | medium  | Jump to label if `arg1` is zero (i.e. false) | label_id | `[i32] -> []`
-drop        | small  | Discard the first `arg1` values in the stack. | N/A | `[i32 *] -> []`
-dup         | small  | Push `arg1` copies of `arg2` value in the stack. | N/A | `[i32 i32] -> [*]`
+jt          | medium  | Jump to label if `arg1` is non-zero (i.e. true) | label_id | `[int] -> []`
+jf          | medium  | Jump to label if `arg1` is zero (i.e. false) | label_id | `[int] -> []`
+drop        | small  | Discard the first `arg1` values in the stack. | N/A | `[int *] -> []`
+dup         | small  | Push `arg1` copies of `arg2` value in the stack. | N/A | `[int int] -> [*]`
 nop         | small   | No operation | N/A | `[] -> []`
 trap        | small   | Interrupt the program | N/A | `[] -> []`
-alloc       | small   | Allocate `arg1` bytes of memory from RAM and returns the address of the allocated region. | N/A | `[i32] -> [i32]`
-free        | small   | Deallocate the memory region pointed by `arg1`. | N/A | `[i32] -> []`
+alloc       | small   | Allocate `arg1` bytes of memory from RAM and returns the address of the allocated region. | N/A | `[int] -> [int]`
+free        | small   | Deallocate the memory region pointed by `arg1`. | N/A | `[int] -> []`
+cat         | small   | Concatenate two or more strings in the stack. | N/A | `[int *str] -> [str]`
+fmt         | small   | Loads the data from the stack and converts them to character string. | N/A | `[str *] -> [str]`
+len         | small   | Returns the length of `arg1`. | N/A | `[] -> [int]`
+copy        | small   | Copy a memory region to another. | N/A | `[] -> []`
+repeat      | small   | Repeat the given byte in a memory region | N/A | `[] -> []`
+print       | small   | Print the string `arg1` in the text mode video memory at position (x:`arg2`,y:`arg3`)  | N/A | `[] -> []`
 
 ### Calling convention
 

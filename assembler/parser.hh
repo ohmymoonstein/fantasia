@@ -12,7 +12,7 @@ enum VariableKinds {
 
 enum ValueTypes {
     VT_INT = 0,
-    VT_STRING = 1,
+    VT_STR = 1,
 };
 
 struct TypeInfo {
@@ -23,7 +23,7 @@ struct TypeInfo {
 struct Variable {
     std::string name;
     TypeInfo type;
-    std::string value;
+    Token value;
     VariableKinds kind = VAR_GLOBAL;
 };
 

@@ -1,5 +1,6 @@
 - ~~Extends lexer.cc OPCODES to include additional information about opcodes (e.g. scheme, types)~~
 - ~~Merge 'i32' and 'u32' as 'int'~~
-- Add support for strings as 'str' type
-- Add instructions to concatenate, cut, format and print strings
+- ~~Add support for strings as 'str' type~~
+- ~~Add instructions to concatenate, cut, format and print strings~~
 - Accept names as immediate
+- Plot AST as HTML source

@@ -11,9 +11,11 @@ struct TypeDetails {
 
 static ValueTypes validate_type( const std::string &type ) {
     // validate and translate variable type
-    if (type == "int") {
+    if (type == "int")
         return VT_INT;
-    } else
+    if (type == "str")
+        return VT_STR;
+    else
         throw std::runtime_error(util_format("Invalid storage type '%s'", type.c_str()));
 }
 
@@ -28,14 +30,31 @@ void Semantic::validate() {
 }
 
 void Semantic::validate_variable(std::shared_ptr<Variable> &target) {
+    const char *literal = target->value.literal.c_str();
     // validate and translate variable type
     target->type.stype = validate_type(target->type.type);
-    // validate value range
-    int64_t value = strtol(target->value.c_str(), nullptr, 10);
 
-    if (value < INT32_MIN || value > UINT32_MAX)
-        throw std::runtime_error(util_format("Value '%s' out of range for '%s'",
-            target->value.c_str(), target->type.type.c_str()));
+    if (target->type.stype == VT_STR && target->value.type != TOK_STRING)
+        throw std::runtime_error(util_format("Expected string literal"));
+    else
+    if (target->type.stype == VT_INT) {
+        if (target->value.type != TOK_INTEGER)
+            throw std::runtime_error(util_format("Expected integer literal"));
+
+        // validate and translate variable type
+        target->type.stype = validate_type(target->type.type);
+        // validate value range
+        char *ptr = nullptr;
+        int64_t value = strtol(literal, &ptr, 10);
+        if (literal == ptr)
+            throw std::runtime_error(util_format("Value '%s' it not a integer", value));
+
+        // TODO: validate errors for 'strtol'
+
+        if (value < INT32_MIN || value > UINT32_MAX)
+            throw std::runtime_error(util_format("Value '%s' out of range for '%s'",
+                literal, target->type.type.c_str()));
+    }
 }
 
 void Semantic::validate_function(std::shared_ptr<Function> &target) {

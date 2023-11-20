@@ -1,4 +1,4 @@
-global $counter int -1
+global $counter str "Olá mundo"
 global $cenoura int 1024
 global $acerola int 22
 
@@ -7,10 +7,16 @@ func $add_values($param1 int, $param2 int) (int,int)
     local $beterraba2 int 99
     const $nome1 int 3201201
     const $nome2 int 3201201
+    const $nome3 str "201201"
 
-    lget 0
+    lget $beterraba1
     lget 1
     add
+
+    ldc 2
+    ldc 2
+    ldv 2
+    cat
 
     return 2
 end

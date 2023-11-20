@@ -25,6 +25,7 @@ static const std::array TOKENS{
     TKLIT(TOK_END),
     TKLIT(TOK_LBREAK),
     TKLIT(TOK_CONST),
+    TKLIT(TOK_STRING),
     TKLIT(TOK_INVALID),
 };
 
@@ -88,6 +89,9 @@ const std::unordered_map<std::string_view, OpcodeInfo> OPCODES = {
     { "dup", {} },
     { "nop", {} },
     { "trap", {} },
+    { "cat", {} },
+    { "fmt", {} },
+    { "len", {} },
 };
 
 Scanner::Scanner(const std::string_view &code) : content_(code) {
@@ -145,6 +149,22 @@ Token Tokenizer::expected( TokenType type ) {
     return token;
 }
 
+Token Tokenizer::expected( std::initializer_list<TokenType> types ) {
+    auto token = advance();
+    for (auto &item : types) {
+        if (token.type == item) return token;
+    }
+
+    std::string tmp;
+    for (auto &item : types) {
+        tmp += Token::name(item);
+        tmp += ' ';
+    }
+
+    throw std::runtime_error(
+        util_format("Expected ( %s) but found %s", tmp.c_str(), Token::name(token.type)));
+}
+
 Token Tokenizer::next() {
     scanner_.skip_spaces();
     auto c = scanner_.get();
@@ -181,6 +201,8 @@ Token Tokenizer::next() {
             return Token(TOK_COMMA, ",");
         case '$':
             return capture_name();
+        case '"':
+            return capture_string();
         default:
             throw std::runtime_error(util_format("Symbol not recognized: %d", (int)c));
     }
@@ -206,8 +228,6 @@ Token Tokenizer::capture_identifier( char c ) {
     Token token(TOK_IDENTIFIER);
     token.literal = c;
 
-    // TODO: capture reserved words (e.g. global, local, func)
-
     do {
         c = scanner_.peek();
         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_')
@@ -215,6 +235,20 @@ Token Tokenizer::capture_identifier( char c ) {
         else
             return token;
         scanner_.get();
+    } while (true);
+}
+
+Token Tokenizer::capture_string() {
+    Token token(TOK_STRING);
+
+    do {
+        char c = scanner_.get();
+        if (c == '\n' || c == 0)
+            throw std::runtime_error(util_format("Unterminated string"));
+        if (c != '"')
+            token.literal += c;
+        else
+            return token;
     } while (true);
 }
 
@@ -239,7 +273,7 @@ Token Tokenizer::peek() {
 }
 
 const char *Token::name(TokenType type) {
-    if (type < TOK_EOF || type > TOK_LBREAK)
+    if (type < TOK_EOF || type > TOK_INVALID)
         return nullptr;
     return TOKENS[type];
 }
