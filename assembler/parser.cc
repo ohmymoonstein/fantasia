@@ -101,7 +101,7 @@ void Parser::parse_parameter_list(std::list<std::shared_ptr<Parameter>> &result)
         param->name = token.literal;
         tokenizer_.advance();
         token = tokenizer_.expected(TOK_IDENTIFIER);
-        param->type = token.literal;
+        param->type.type = token.literal;
         result.push_back( param );
 
         token = tokenizer_.peek();
@@ -112,10 +112,12 @@ void Parser::parse_parameter_list(std::list<std::shared_ptr<Parameter>> &result)
     tokenizer_.advance();
 }
 
-void Parser::parse_type_list(std::list<std::string> &result) {
+void Parser::parse_type_list(std::list<TypeInfo> &result) {
     Token token;
     while ((token = tokenizer_.advance()).type == TOK_IDENTIFIER) {
-        result.push_back(token.literal);
+        TypeInfo type;
+        type.type = token.literal;
+        result.push_back(type);
         token = tokenizer_.peek(); // ) or ,
         if (token.type == TOK_RPAREN) break;
         tokenizer_.expected(TOK_COMMA);
@@ -132,7 +134,7 @@ std::shared_ptr<Variable> Parser::parse_variable() {
     result->name = token.literal;
     // variable type
     token = tokenizer_.expected(TOK_IDENTIFIER);
-    result->type = token.literal;
+    result->type.type = token.literal;
     // initialization value
     token = tokenizer_.expected(TOK_INTEGER);
     result->value = token.literal;

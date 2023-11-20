@@ -1,23 +1,23 @@
-global $counter i32 -1
-global $cenoura u32 1024
-global $acerola i32 22
+global $counter int -1
+global $cenoura int 1024
+global $acerola int 22
 
-func $global($param1 i32, $param2 i32) (i32,i32)
-    local $beterraba1 u32 99
-    local $beterraba2 u32 99
-    const $nome1 i32 3201201
-    const $nome2 i32 3201201
+func $add_values($param1 int, $param2 int) (int,int)
+    local $beterraba1 int 99
+    local $beterraba2 int 99
+    const $nome1 int 3201201
+    const $nome2 int 3201201
 
-    lget
-    lget
+    lget 0
+    lget 1
     add
 
-    return 1
+    return 2
 end
 
-func $main() (i32)
-    ldv
+func $main() (int)
+    ldv 55
     ldv 1
-    call
+    call 0
     return 1
 end

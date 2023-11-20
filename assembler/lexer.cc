@@ -5,7 +5,6 @@
 #include <array>
 #include <iostream>
 #include <cstdarg>
-#include <set>
 
 #define TKLIT(x) #x
 
@@ -42,54 +41,54 @@ const std::array<Keyword, 5> KEYWORDS = {{
     {"func", TOK_FUNC},
 }};
 
-const std::set<std::string_view> OPCODES = {{
-    "add",
-    "sub",
-    "mul",
-    "sdiv",
-    "udiv",
-    "srem",
-    "urem",
-    "and",
-    "or",
-    "xor",
-    "shl",
-    "shr",
-    "rotl",
-    "rotr",
-    "eq",
-    "ne",
-    "slt",
-    "sgt",
-    "sle",
-    "sge",
-    "ult",
-    "ugt",
-    "ule",
-    "uge",
-    "clz",
-    "ctz",
-    "cbit",
-    "load",
-    "store",
-    "ldc",
-    "ldv",
-    "ldo",
-    "ldz",
-    "lget",
-    "lset",
-    "gget",
-    "gset",
-    "call",
-    "return",
-    "jmp",
-    "jt",
-    "jf",
-    "drop",
-    "dup",
-    "nop",
-    "trap",
-}};
+const std::unordered_map<std::string_view, OpcodeInfo> OPCODES = {
+    { "add", {} },
+    { "sub", {} },
+    { "mul", {} },
+    { "sdiv", {} },
+    { "udiv", {} },
+    { "srem", {} },
+    { "urem", {} },
+    { "and", {} },
+    { "or", {} },
+    { "xor", {} },
+    { "shl", {} },
+    { "shr", {} },
+    { "rotl", {} },
+    { "rotr", {} },
+    { "eq", {} },
+    { "ne", {} },
+    { "slt", {} },
+    { "sgt", {} },
+    { "sle", {} },
+    { "sge", {} },
+    { "ult", {} },
+    { "ugt", {} },
+    { "ule", {} },
+    { "uge", {} },
+    { "clz", {} },
+    { "ctz", {} },
+    { "cbit", {} },
+    { "load", {} },
+    { "store", {} },
+    { "ldc", { true } },
+    { "ldv", { true } },
+    { "ldo", {} },
+    { "ldz", {} },
+    { "lget", { true } },
+    { "lset", { true } },
+    { "gget", { true } },
+    { "gset", { true } },
+    { "call", { true } },
+    { "return", { true } },
+    { "jmp", { true } },
+    { "jt", { true } },
+    { "jf", { true } },
+    { "drop", {} },
+    { "dup", {} },
+    { "nop", {} },
+    { "trap", {} },
+};
 
 Scanner::Scanner(const std::string_view &code) : content_(code) {
     cursor_ = content_.begin();
@@ -159,7 +158,6 @@ Token Tokenizer::next() {
             }
         }
         // translate opcoes
-        // TODO: faster search
         if (OPCODES.find(token.literal) != OPCODES.end()) {
             token.type = TOK_OPCODE;
         }
@@ -196,7 +194,7 @@ Token Tokenizer::capture_name() {
     char c;
     do {
         c = scanner_.peek();
-        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_')
             token.literal += c;
         else
             return token;
@@ -212,7 +210,7 @@ Token Tokenizer::capture_identifier( char c ) {
 
     do {
         c = scanner_.peek();
-        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_')
             token.literal += c;
         else
             return token;

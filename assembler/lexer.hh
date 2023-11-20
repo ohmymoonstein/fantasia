@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 enum TokenType {
     TOK_EOF,
@@ -21,6 +22,12 @@ enum TokenType {
     TOK_CONST,
     TOK_INVALID,
 };
+
+struct OpcodeInfo {
+    bool has_immediate = false;
+};
+
+extern const std::unordered_map<std::string_view, OpcodeInfo> OPCODES;
 
 struct Token {
     TokenType type; // TOK_*

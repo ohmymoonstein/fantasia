@@ -3,27 +3,21 @@
 #include <unordered_map>
 #include <set>
 
-struct TypeInfo {
+struct TypeDetails {
     ValueTypes code;
     int64_t min_value;
     int64_t max_value;
 };
 
-static const std::unordered_map<std::string_view, TypeInfo> TYPES = {
-    { "i32", {VT_I32, INT32_MIN, INT32_MAX} },
-    { "u32", {VT_U32, 0, UINT32_MAX} },
-};
-
 static ValueTypes validate_type( const std::string &type ) {
     // validate and translate variable type
-    auto it = TYPES.find(type);
-    if (it == TYPES.end())
+    if (type == "int") {
+        return VT_INT;
+    } else
         throw std::runtime_error(util_format("Invalid storage type '%s'", type.c_str()));
-    return it->second.code;
 }
 
 Semantic::Semantic(std::shared_ptr<Program> program) : program_(program) {
-
 }
 
 void Semantic::validate() {
@@ -35,15 +29,13 @@ void Semantic::validate() {
 
 void Semantic::validate_variable(std::shared_ptr<Variable> &target) {
     // validate and translate variable type
-    auto it = TYPES.find(target->type);
-    if (it == TYPES.end())
-        throw std::runtime_error(util_format("Invalid storage type '%s'", target->type.c_str()));
-    target->stype = it->second.code;
+    target->type.stype = validate_type(target->type.type);
     // validate value range
     int64_t value = strtol(target->value.c_str(), nullptr, 10);
-    if (value < it->second.min_value || value > it->second.max_value)
+
+    if (value < INT32_MIN || value > UINT32_MAX)
         throw std::runtime_error(util_format("Value '%s' out of range for '%s'",
-            target->value.c_str(), target->type.c_str()));
+            target->value.c_str(), target->type.type.c_str()));
 }
 
 void Semantic::validate_function(std::shared_ptr<Function> &target) {
@@ -51,12 +43,16 @@ void Semantic::validate_function(std::shared_ptr<Function> &target) {
 
     // parameters
     for (auto &param : target->params) {
-        param->stype = validate_type(param->type);
+        param->type.stype = validate_type(param->type.type);
         if (names.find(param->name) != names.end())
             throw std::runtime_error(util_format("Name '%s' already defined",
                 param->name.c_str()));
         names.insert(param->name);
     }
+    for (auto &type : target->returns) {
+        type.stype = validate_type(type.type);
+    }
+
     // local variable
     for (auto &var : target->variables) {
         validate_variable(var);
@@ -75,15 +71,31 @@ void Semantic::validate_function(std::shared_ptr<Function> &target) {
     }
     // function body
     for (auto &instr : target->body) {
-        validate_instruction(instr);
+        validate_instruction(target, instr);
     }
 }
 
-void Semantic::validate_instruction(std::shared_ptr<Instruction> &target) {
+void Semantic::validate_instruction(const std::shared_ptr<Function> &parent, std::shared_ptr<Instruction> &target) {
+    auto it = OPCODES.find(target->opcode);
+    if (it == OPCODES.end())
+        throw std::runtime_error(util_format("Unknown instruction '%s'", target->opcode.c_str()));
+
+    if (it->second.has_immediate && target->immediate.empty())
+        throw std::runtime_error(util_format("Expected immediate for '%s'", target->opcode.c_str()));
+    if (!it->second.has_immediate && !target->immediate.empty())
+        throw std::runtime_error(util_format("Unexpected immediate for '%s'", target->opcode.c_str()));
+
     if (!target->immediate.empty()) {
         int64_t value = strtol(target->immediate.c_str(), nullptr, 10);
         if (value < 0 || value > 1023) // 10-bits
             throw std::runtime_error(util_format("Immediate value out of range '%s'",
                 target->immediate.c_str()));
+
+        // TODO: replace string comparison by numeric comparison
+        if (it->first == "return") {
+            if (value != (int64_t) parent->returns.size())
+                throw std::runtime_error(util_format("Expected %d return values instead of %d",
+                    (int) parent->returns.size(), (int) value));
+        }
     }
 }

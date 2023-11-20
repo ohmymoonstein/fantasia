@@ -18,13 +18,13 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Variable> &targ
     else
         os << "Variable";
     os << " [name: '" << target->name
-        << "', type: '" << target->type
+        << "', type: '" << target->type.type
         << "', value: '" << target->value << "']";
     return os;
 }
 
 std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Parameter> &target) {
-    os << "    Parameter [name: " << target->name << ", type: " << target->type << "]";
+    os << "    Parameter [name: " << target->name << ", type: " << target->type.type << "]";
     return os;
 }
 
@@ -42,7 +42,7 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Function> &targ
     {
         os << ", returns: (";
         for (auto &type : target->returns)
-            os << type << ',';
+            os << type.type << ',';
         os << ")";
     }
     os << "]";

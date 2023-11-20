@@ -13,7 +13,7 @@ Start | End   | Description  | Size
 2D000 | 2D3FF | Input IO     | 1 KB
 2D400 | 3FFFF | Unused       | 75 KB
 
-### Text VRAM IO
+### Text VRAM
 
 Text mode VRAM information is accessible at 0x04000 as an array of 32640 entries of 16-bit integers (1020 bytes). Each entry in the array represents a character in the 30x17 text mode screen. The last 32-bits in this region is unused. The following table shows the layout for elements of this array.
 
@@ -149,7 +149,9 @@ jf          | medium  | Jump to label if `arg1` is zero (i.e. false) | label_id 
 drop        | small  | Discard the first `arg1` values in the stack. | N/A | `[i32 *] -> []`
 dup         | small  | Push `arg1` copies of `arg2` value in the stack. | N/A | `[i32 i32] -> [*]`
 nop         | small   | No operation | N/A | `[] -> []`
-trap        | small   | | N/A | `[] -> []`
+trap        | small   | Interrupt the program | N/A | `[] -> []`
+alloc       | small   | Allocate `arg1` bytes of memory from RAM and returns the address of the allocated region. | N/A | `[i32] -> [i32]`
+free        | small   | Deallocate the memory region pointed by `arg1`. | N/A | `[i32] -> []`
 
 ### Calling convention
 
