@@ -24,11 +24,64 @@ enum TokenType {
     TOK_INVALID,
 };
 
-struct OpcodeInfo {
-    bool has_immediate = false;
+enum Opcodes {
+    OPC_ADD = 0,
+    OPC_SUB,
+    OPC_MUL,
+    OPC_SDIV,
+    OPC_UDIV,
+    OPC_SREM,
+    OPC_UREM,
+    OPC_AND,
+    OPC_OR,
+    OPC_XOR,
+    OPC_SHL,
+    OPC_SHR,
+    OPC_ROTL,
+    OPC_ROTR,
+    OPC_EQ,
+    OPC_NE,
+    OPC_SLT,
+    OPC_SGT,
+    OPC_SLE,
+    OPC_SGE,
+    OPC_ULT,
+    OPC_UGT,
+    OPC_ULE,
+    OPC_UGE,
+    OPC_CLZ,
+    OPC_CTZ,
+    OPC_CBIT,
+    OPC_LOAD,
+    OPC_STORE,
+    OPC_LDC,
+    OPC_LDV,
+    OPC_LDO,
+    OPC_LDZ,
+    OPC_LGET,
+    OPC_LSET,
+    OPC_GGET,
+    OPC_GSET,
+    OPC_CALL,
+    OPC_RETURN,
+    OPC_JMP,
+    OPC_JT,
+    OPC_JF,
+    OPC_DROP,
+    OPC_DUP,
+    OPC_NOP,
+    OPC_TRAP,
+    OPC_CAT,
+    OPC_FMT,
+    OPC_LEN,
 };
 
-extern const std::unordered_map<std::string_view, OpcodeInfo> OPCODES;
+struct OpcodeDetail {
+    Opcodes opcode;
+    int immediate_types = 0;
+};
+
+extern const std::unordered_map<std::string_view, OpcodeDetail> OPCODES;
 
 struct Token {
     TokenType type; // TOK_*

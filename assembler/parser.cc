@@ -1,4 +1,4 @@
-#include "parser.hh"
+#include <fasm/parser.hh>
 #include "util.hh"
 #include <stdexcept>
 #include <iostream>
@@ -80,12 +80,26 @@ void Parser::parse_function_body( std::list<std::shared_ptr<Instruction>> &resul
     while ((token = tokenizer_.peek()).type == TOK_OPCODE) {
         // instruction (opcode)
         auto instr = std::make_shared<Instruction>();
-        instr->opcode = token.literal;
+        instr->opcode.literal = token.literal;
         tokenizer_.advance();
         // check for immediate
         token = tokenizer_.peek();
-        if (tokenizer_.peek().type == TOK_INTEGER) {
-            instr->immediate = token.literal;
+        if (tokenizer_.peek().type == TOK_INTEGER || tokenizer_.peek().type == TOK_NAME ||
+            tokenizer_.peek().type == TOK_STRING) {
+            instr->immediate.literal = token.literal;
+            switch (tokenizer_.peek().type) {
+                case TOK_INTEGER:
+                    instr->immediate.type = IT_INT;
+                    break;
+                case TOK_STRING:
+                    instr->immediate.type = IT_STR;
+                    break;
+                case TOK_NAME:
+                    instr->immediate.type = IT_NAME;
+                    break;
+                default:
+                    throw std::runtime_error("Unsupported type");
+            }
             tokenizer_.advance();
         }
         result.push_back(instr);
@@ -137,7 +151,8 @@ std::shared_ptr<Variable> Parser::parse_variable() {
     result->type.type = token.literal;
     // initialization value
     token = tokenizer_.expected({TOK_INTEGER, TOK_STRING});
-    result->value = token;
+    result->value = token.literal;
+    result->value_type = (token.type == TOK_INTEGER) ? VT_INT : VT_STR;
     // line break
     tokenizer_.expected(TOK_LBREAK);
 

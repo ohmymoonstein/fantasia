@@ -2,5 +2,5 @@
 - ~~Merge 'i32' and 'u32' as 'int'~~
 - ~~Add support for strings as 'str' type~~
 - ~~Add instructions to concatenate, cut, format and print strings~~
-- Accept names as immediate
+- ~~Accept names as immediate~~
 - Plot AST as HTML source

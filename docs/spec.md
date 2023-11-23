@@ -148,8 +148,8 @@ return      | medium  | Clean up the stack and returns `count` values (zero or m
 jmp         | medium  | Jump to label unconditionally. | label_id | `[] -> []`
 jt          | medium  | Jump to label if `arg1` is non-zero (i.e. true) | label_id | `[int] -> []`
 jf          | medium  | Jump to label if `arg1` is zero (i.e. false) | label_id | `[int] -> []`
-drop        | small  | Discard the first `arg1` values in the stack. | N/A | `[int *] -> []`
-dup         | small  | Push `arg1` copies of `arg2` value in the stack. | N/A | `[int int] -> [*]`
+drop        | small   | Discard the first `arg1` values in the stack. | N/A | `[int *] -> []`
+dup         | small   | Push `arg1` copies of `arg2` value in the stack. | N/A | `[int int] -> [*]`
 nop         | small   | No operation | N/A | `[] -> []`
 trap        | small   | Interrupt the program | N/A | `[] -> []`
 alloc       | small   | Allocate `arg1` bytes of memory from RAM and returns the address of the allocated region. | N/A | `[int] -> [int]`
@@ -157,7 +157,7 @@ free        | small   | Deallocate the memory region pointed by `arg1`. | N/A | 
 cat         | small   | Concatenate two or more strings in the stack. | N/A | `[int *str] -> [str]`
 fmt         | small   | Loads the data from the stack and converts them to character string. | N/A | `[str *] -> [str]`
 len         | small   | Returns the length of `arg1`. | N/A | `[] -> [int]`
-copy        | small   | Copy a memory region to another. | N/A | `[] -> []`
+copy        | small   | Copy `arg1` bytes from memory address `arg2` to memory address `arg3`. The addresses in `arg2` and `arg3` must be 32-bits aligned. The size in `arg1` must be multiple of 4. | N/A | `[] -> []`
 repeat      | small   | Repeat the given byte in a memory region | N/A | `[] -> []`
 print       | small   | Print the string `arg1` in the text mode video memory at position (x:`arg2`,y:`arg3`)  | N/A | `[] -> []`
 

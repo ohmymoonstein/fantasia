@@ -3,9 +3,10 @@
 #include <string>
 #include <fstream>
 #include <exception>
-#include "lexer.hh"
-#include "parser.hh"
-#include "semantic.hh"
+#include <fasm/lexer.hh>
+#include <fasm/parser.hh>
+#include <fasm/semantic.hh>
+#include "debugging.hh"
 
 int main(int argc, char **argv) {
     std::ifstream input(argv[1]);

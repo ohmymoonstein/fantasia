@@ -1,4 +1,4 @@
-#include "semantic.hh"
+#include <fasm/semantic.hh>
 #include "util.hh"
 #include <unordered_map>
 #include <set>
@@ -30,15 +30,15 @@ void Semantic::validate() {
 }
 
 void Semantic::validate_variable(std::shared_ptr<Variable> &target) {
-    const char *literal = target->value.literal.c_str();
+    const char *literal = target->value.c_str();
     // validate and translate variable type
     target->type.stype = validate_type(target->type.type);
 
-    if (target->type.stype == VT_STR && target->value.type != TOK_STRING)
+    if (target->type.stype == VT_STR && target->value_type != VT_STR)
         throw std::runtime_error(util_format("Expected string literal"));
     else
     if (target->type.stype == VT_INT) {
-        if (target->value.type != TOK_INTEGER)
+        if (target->value_type != VT_INT)
             throw std::runtime_error(util_format("Expected integer literal"));
 
         // validate and translate variable type
@@ -95,26 +95,36 @@ void Semantic::validate_function(std::shared_ptr<Function> &target) {
 }
 
 void Semantic::validate_instruction(const std::shared_ptr<Function> &parent, std::shared_ptr<Instruction> &target) {
-    auto it = OPCODES.find(target->opcode);
+    const char *opcode = target->opcode.literal.c_str();
+
+    // get information about the current immediate
+    auto it = OPCODES.find(target->opcode.literal);
     if (it == OPCODES.end())
-        throw std::runtime_error(util_format("Unknown instruction '%s'", target->opcode.c_str()));
-
-    if (it->second.has_immediate && target->immediate.empty())
-        throw std::runtime_error(util_format("Expected immediate for '%s'", target->opcode.c_str()));
-    if (!it->second.has_immediate && !target->immediate.empty())
-        throw std::runtime_error(util_format("Unexpected immediate for '%s'", target->opcode.c_str()));
-
-    if (!target->immediate.empty()) {
-        int64_t value = strtol(target->immediate.c_str(), nullptr, 10);
-        if (value < 0 || value > 1023) // 10-bits
-            throw std::runtime_error(util_format("Immediate value out of range '%s'",
-                target->immediate.c_str()));
-
-        // TODO: replace string comparison by numeric comparison
-        if (it->first == "return") {
-            if (value != (int64_t) parent->returns.size())
-                throw std::runtime_error(util_format("Expected %d return values instead of %d",
-                    (int) parent->returns.size(), (int) value));
+        throw std::runtime_error(util_format("Unknown instruction '%s'", opcode));
+    target->opcode.value = it->second.opcode;
+    // validate the immediate presence
+    if (it->second.immediate_types != 0) {
+        if (target->immediate.literal.empty())
+            throw std::runtime_error(util_format("Expected immediate for '%s'", opcode));
+        // validate the immediate type against the valid ones
+        if ((it->second.immediate_types & target->immediate.type) == 0)
+            throw std::runtime_error(util_format("Unsupported immediate type for '%s'", opcode));
+        if (target->immediate.type == IT_INT) {
+            // validate immediate value
+            // TODO: validate errors for 'strtol'
+            int64_t value = strtol(target->immediate.literal.c_str(), nullptr, 10);
+            if (value < 0 || value > 1023) // 10-bits
+                throw std::runtime_error(util_format("Immediate value out of range '%s'",
+                    target->immediate.literal.c_str()));
+            target->immediate.value = (int) value;
+            // check for number of return values
+            if (target->opcode.value == OPC_RETURN) {
+                if (value != (int64_t) parent->returns.size())
+                    throw std::runtime_error(util_format("Expected %d return values instead of %d",
+                        (int) parent->returns.size(), (int) value));
+            }
         }
     }
+    if (it->second.immediate_types == 0 && !target->immediate.literal.empty())
+        throw std::runtime_error(util_format("Unexpected immediate for '%s'", opcode));
 }

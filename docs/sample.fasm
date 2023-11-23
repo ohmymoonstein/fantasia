@@ -7,9 +7,9 @@ func $add_values($param1 int, $param2 int) (int,int)
     local $beterraba2 int 99
     const $nome1 int 3201201
     const $nome2 int 3201201
-    const $nome3 str "201201"
+    const $nome3 str "aasdasdas asdasdasd asdasdasd"
 
-    lget $beterraba1
+    ldc $nome1
     lget 1
     add
 

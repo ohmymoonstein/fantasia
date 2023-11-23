@@ -1,4 +1,4 @@
-#include "parser.hh"
+#include "debugging.hh"
 #include <iostream>
 
 std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Program> &target) {
@@ -20,10 +20,10 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Variable> &targ
     os << " [name: '" << target->name
         << "', type: '" << target->type.type;
 
-    if (target->value.type == TOK_STRING)
-        os << "', value: '" << target->value.literal << "']";
+    if (target->value_type == VT_STR)
+        os << "', value: '" << target->value << "']";
     else
-        os << "', value: " << target->value.literal << "]";
+        os << "', value: " << target->value << "]";
     return os;
 }
 
@@ -33,9 +33,12 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Parameter> &tar
 }
 
 std::ostream& operator<<(std::ostream &os, const std::shared_ptr<Instruction> &target) {
-    os << "    Instruction [opcode: " << target->opcode;
-    if (!target->immediate.empty())
-        os << ", immediate: " << target->immediate;
+    os << "    Instruction [opcode: " << target->opcode.literal;
+    if (!target->immediate.literal.empty())
+    {
+        os << ", immediate_type: " << target->immediate.type;
+        os << ", immediate: " << target->immediate.literal;
+    }
     os << "]";
     return os;
 }

@@ -12,13 +12,19 @@ else()
 endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0")
 
-add_executable(assembler
+add_library(fasm_lib STATIC
     "assembler/util.cc"
-    "assembler/main.cc"
     "assembler/semantic.cc"
     "assembler/lexer.cc"
-    "assembler/debugging.cc"
     "assembler/parser.cc")
-set_target_properties(assembler PROPERTIES
+target_include_directories(fasm_lib
+    PUBLIC "assembler/include/"
+)
+
+add_executable(fasm
+    "assembler/main.cc"
+    "assembler/debugging.cc")
+target_link_libraries(fasm fasm_lib)
+set_target_properties(fasm PROPERTIES
     OUTPUT_NAME "fasm"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" )
